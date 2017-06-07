@@ -1,0 +1,55 @@
+{
+  "name": "multidatastore",
+  "version": "0.0.1",
+  "description": "Store objects into multiple stores.",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test/**/*.js | tap-spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hellofloat/multidatstore.git"
+  },
+  "keywords": [],
+  "author": "Andy Burke <aburke@bitflood.org>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hellofloat/multidatstore/issues"
+  },
+  "homepage": "https://github.com/hellofloat/multidatstore#readme",
+  "dependencies": {
+    "async": "^2.4.0",
+    "extend": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "jshintConfig": {
+    "curly": true,
+    "eqeqeq": true,
+    "eqnull": true,
+    "esversion": 6,
+    "forin": true,
+    "freeze": true,
+    "futurehostile": true,
+    "latedef": "nofunc",
+    "maxcomplexity": 15,
+    "maxdepth": 3,
+    "maxparams": 4,
+    "maxstatements": 30,
+    "noarg": true,
+    "nocomma": true,
+    "node": true,
+    "nonbsp": true,
+    "nonew": true,
+    "strict": "global",
+    "undef": true,
+    "unused": true
+  },
+  "devDependencies": {
+    "alasql": "^0.4.0",
+    "sqlstring": "^2.2.0",
+    "tap-spec": "^4.1.1",
+    "tape": "^4.6.3"
+  }
+}
