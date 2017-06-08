@@ -63,7 +63,7 @@ const Rethink_Mock_Table = {
                         delete connection[ id ];
                         callback();
                     }
-                }
+                };
             }
         };
     }

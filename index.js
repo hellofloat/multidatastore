@@ -1,7 +1,6 @@
 'use strict';
 
 const async = require( 'async' );
-const extend = require( 'extend' );
 
 module.exports = {
     add_driver: function( driver ) {

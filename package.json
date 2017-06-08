@@ -1,8 +1,11 @@
 {
   "name": "multidatastore",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Store objects into multiple stores.",
   "main": "index.js",
+  "files": [
+    "drivers/"
+  ],
   "scripts": {
     "test": "tape test/**/*.js | tap-spec"
   },
