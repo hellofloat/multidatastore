@@ -6,6 +6,7 @@ const extend = require( 'extend' );
 module.exports = {
     init: function( _options ) {
         this.options = extend( {
+            id_field: 'id',
             async: true,
             async_callback: error => {
                 if ( error ) {
@@ -38,7 +39,7 @@ module.exports = {
         }
 
         const mapped_object = this.options.mapper( object );
-        const mapped_object_data_keys = Object.keys( mapped_object ).sort().filter( key => key !== 'id' );
+        const mapped_object_data_keys = Object.keys( mapped_object ).sort().filter( key => key !== this.options.id_field );
 
         let client = null;
         let done = null;
@@ -56,8 +57,8 @@ module.exports = {
 
             next => {
                 client.query( {
-                    text: `select 1 from ${ this.options.table } where id=($1)`,
-                    values: [ mapped_object.id ]
+                    text: `select 1 from ${ this.options.table } where ${ this.options.id_field }=($1)`,
+                    values: [ mapped_object[ this.options.id_field ] ]
                 }, ( error, result ) => {
                     exists = result && result.rows && result.rows.length;
                     next( error );
@@ -73,21 +74,21 @@ module.exports = {
                     text = `
                         update ${ this.options.table }
                         set ${ mapped_object_data_keys.map( ( key, index ) => key + '=($' + ( index + 1 ) + ')' ).join( ', ' ) }
-                        where id=($${ mapped_object_data_keys.length + 1 });`;
+                        where ${ this.options.id_field }=($${ mapped_object_data_keys.length + 1 });`;
 
                     values = mapped_object_data_keys.map( key => mapped_object[ key ] );
-                    values.push( mapped_object.id );
+                    values.push( mapped_object[ this.options.id_field ] );
                 } else {
                     text = `
                         insert into ${ this.options.table } (
-                            ${ [ 'id' ].concat( mapped_object_data_keys ).join( ',' ) }
+                            ${ [ this.options.id_field ].concat( mapped_object_data_keys ).join( ',' ) }
                         )
                         values (
-                            ${ [ 'id' ].concat( mapped_object_data_keys ).map( ( key, index ) => '$' + ( index + 1 ) ) }
+                            ${ [ this.options.id_field ].concat( mapped_object_data_keys ).map( ( key, index ) => '$' + ( index + 1 ) ) }
                         );
                     `;
 
-                    values = [ 'id' ].concat( mapped_object_data_keys ).map( key => mapped_object[ key ] );
+                    values = [ this.options.id_field ].concat( mapped_object_data_keys ).map( key => mapped_object[ key ] );
                 }
 
                 query = {
@@ -130,7 +131,7 @@ module.exports = {
 
             next => {
                 client.query( {
-                    text: `select * from ${ this.options.table } where id=($1)`,
+                    text: `select * from ${ this.options.table } where ${ this.options.id_field }=($1)`,
                     values: [ id ]
                 }, ( error, _db_read_result ) => {
                     db_read_result = _db_read_result && _db_read_result.rows && _db_read_result.rows.length && _db_read_result.rows[ 0 ];
@@ -173,7 +174,7 @@ module.exports = {
 
             next => {
                 client.query( {
-                    text: `delete from ${ this.options.table } where id=($1)`,
+                    text: `delete from ${ this.options.table } where ${ this.options.id_field }=($1)`,
                     values: [ id ]
                 }, next );
             }

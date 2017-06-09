@@ -244,3 +244,218 @@ tape( 'postgres: get (unreadable)', t => {
         t.end();
     } );
 } );
+
+///////////////////////////////////
+// different id field
+
+tape( 'postgres: put (non-standard id_field)', t => {
+    const multi_data_store = Object.create( Multi_Data_Store );
+    const postgres_driver = Object.create( Postgres_Driver );
+    const postgres_mock_pool = Object.create( Postgres_Mock_Pool );
+
+    alasql( 'CREATE TABLE test (_id string, data string)' );
+
+    postgres_driver.init( {
+        async: false,
+        pool: postgres_mock_pool,
+        table: 'test',
+        id_field: '_id',
+        mapper: object => {
+            return {
+                _id: object.id,
+                data: object.test
+            };
+        },
+        unmapper: result => {
+            return {
+                id: result._id,
+                test: result.data
+            };
+        }
+    } );
+
+    multi_data_store.add_driver( postgres_driver );
+
+    multi_data_store.put( {
+        id: '1',
+        test: 'one'
+    }, error => {
+        t.error( error, 'able to put' );
+        alasql( 'DROP TABLE test' );
+        t.end();
+    } );
+} );
+
+tape( 'postgres: put (update) (non-standard id_field)', t => {
+    const multi_data_store = Object.create( Multi_Data_Store );
+    const postgres_driver = Object.create( Postgres_Driver );
+    const postgres_mock_pool = Object.create( Postgres_Mock_Pool );
+
+    alasql( 'CREATE TABLE test (_id string, data string)' );
+
+    postgres_driver.init( {
+        async: false,
+        readable: true,
+        pool: postgres_mock_pool,
+        table: 'test',
+        id_field: '_id',
+        mapper: object => {
+            return {
+                _id: object.id,
+                data: object.test
+            };
+        },
+        unmapper: result => {
+            return {
+                id: result._id,
+                test: result.data
+            };
+        }
+    } );
+
+    multi_data_store.add_driver( postgres_driver );
+
+    async.series( [
+        next => {
+            multi_data_store.put( {
+                id: '1',
+                test: 'foo'
+            }, error => {
+                t.error( error, 'put test object (initial)' );
+                next( error );
+            } );
+        },
+
+        next => {
+            multi_data_store.put( {
+                id: '1',
+                test: 'bar'
+            }, error => {
+                t.error( error, 'put test object (update)' );
+                next( error );
+            } );
+        },
+
+        next => {
+            multi_data_store.get( '1', ( error, result ) => {
+                t.ok( result, 'got result from store' );
+                t.equal( result && result.id, '1', 'id is correct' );
+                t.equal( result && result.test, 'bar', 'content is correct' );
+                next( error );
+            } );
+        }
+    ], error => {
+        t.error( error, 'no errors' );
+        alasql( 'DROP TABLE test' );
+        t.end();
+    } );
+} );
+
+tape( 'postgres: get (readable) (non-standard id_field)', t => {
+    const multi_data_store = Object.create( Multi_Data_Store );
+    const postgres_driver = Object.create( Postgres_Driver );
+    const postgres_mock_pool = Object.create( Postgres_Mock_Pool );
+
+    alasql( 'CREATE TABLE test (_id string, data string)' );
+
+    postgres_driver.init( {
+        async: false,
+        readable: true,
+        pool: postgres_mock_pool,
+        table: 'test',
+        id_field: '_id',
+        mapper: object => {
+            return {
+                _id: object.id,
+                data: object.test
+            };
+        },
+        unmapper: result => {
+            return {
+                id: result._id,
+                test: result.data
+            };
+        }
+    } );
+
+    multi_data_store.add_driver( postgres_driver );
+
+    async.series( [
+        next => {
+            multi_data_store.put( {
+                id: '1',
+                test: 'foo'
+            }, error => {
+                t.error( error, 'put test object' );
+                next( error );
+            } );
+        },
+
+        next => {
+            multi_data_store.get( '1', ( error, result ) => {
+                t.ok( result, 'got result from store' );
+                t.equal( result && result.id, '1', 'id is correct' );
+                t.equal( result && result.test, 'foo', 'content is correct' );
+                next( error );
+            } );
+        }
+    ], error => {
+        t.error( error, 'no errors' );
+        alasql( 'DROP TABLE test' );
+        t.end();
+    } );
+} );
+
+tape( 'postgres: get (unreadable) (non-standard id_field)', t => {
+    const multi_data_store = Object.create( Multi_Data_Store );
+    const postgres_driver = Object.create( Postgres_Driver );
+    const postgres_mock_pool = Object.create( Postgres_Mock_Pool );
+
+    alasql( 'CREATE TABLE test (_id string, data string)' );
+
+    postgres_driver.init( {
+        async: false,
+        pool: postgres_mock_pool,
+        table: 'test',
+        id_field: '_id',
+        mapper: object => {
+            return {
+                _id: object.id,
+                data: object.test
+            };
+        },
+        unmapper: result => {
+            return {
+                id: result._id,
+                test: result.data
+            };
+        }
+    } );
+
+    multi_data_store.add_driver( postgres_driver );
+
+    async.series( [
+        next => {
+            multi_data_store.put( {
+                id: '1',
+                test: 'foo'
+            }, error => {
+                t.error( error, 'put test object' );
+                next( error );
+            } );
+        },
+
+        next => {
+            multi_data_store.get( '1', error => {
+                t.ok( error, 'got error' );
+                t.equal( error && error.error, 'missing readable driver', 'got: missing readable driver' );
+                next();
+            } );
+        }
+    ], error => {
+        t.error( error, 'no errors' );
+        alasql( 'DROP TABLE test' );
+        t.end();
+    } );
+} );
+
