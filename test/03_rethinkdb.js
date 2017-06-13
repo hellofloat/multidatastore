@@ -28,7 +28,7 @@ const Rethink_Mock_Table = {
                         delete connection[ id ];
                         callback();
                     }
-                }
+                };
             }
         };
     }
@@ -129,6 +129,124 @@ tape( 'rethink: get (unreadable)', t => {
                 next();
             } );
         }
+    ], error => {
+        t.error( error, 'no errors' );
+        t.end();
+    } );
+} );
+
+tape( 'rethink: delete', t => {
+    const multi_data_store = Object.create( Multi_Data_Store );
+    const rethink_driver = Object.create( Rethink_Driver );
+    const rethink_table = Object.create( Rethink_Mock_Table );
+    const rethink_connection = {};
+
+    rethink_driver.init( {
+        async: false,
+        readable: true,
+        table: rethink_table,
+        connection: rethink_connection
+    } );
+
+    multi_data_store.add_driver( rethink_driver );
+
+    const id = Math.floor( Math.random() * 10000 );
+
+    async.series( [
+        next => {
+            multi_data_store.put( {
+                id: id,
+                test: 'foo'
+            }, error => {
+                t.error( error, 'put test object' );
+                next( error );
+            } );
+        },
+
+        next => {
+            multi_data_store.get( id, ( error, result ) => {
+                t.ok( result, 'got result from store' );
+                t.equal( result && result.id, id, 'id is correct' );
+                t.equal( result && result.test, 'foo', 'content is correct' );
+                next( error );
+            } );
+        },
+
+        next => {
+            multi_data_store.delete( id, error => {
+                t.error( error, 'deleted object' );
+                next( error );
+            } );
+        },
+
+        next => {
+            multi_data_store.get( id, ( error, result ) => {
+                t.error( error, 'no error getting non-existent key' );
+                t.notOk( result, 'got non-existent result' );
+                next();
+            } );
+        }
+
+    ], error => {
+        t.error( error, 'no errors' );
+        t.end();
+    } );
+} );
+
+tape( 'rethink: delete (ignore_delete)', t => {
+    const multi_data_store = Object.create( Multi_Data_Store );
+    const rethink_driver = Object.create( Rethink_Driver );
+    const rethink_table = Object.create( Rethink_Mock_Table );
+    const rethink_connection = {};
+
+    rethink_driver.init( {
+        async: false,
+        readable: true,
+        ignore_delete: true,
+        table: rethink_table,
+        connection: rethink_connection
+    } );
+
+    multi_data_store.add_driver( rethink_driver );
+
+    const id = Math.floor( Math.random() * 10000 );
+
+    async.series( [
+        next => {
+            multi_data_store.put( {
+                id: id,
+                test: 'foo'
+            }, error => {
+                t.error( error, 'put test object' );
+                next( error );
+            } );
+        },
+
+        next => {
+            multi_data_store.get( id, ( error, result ) => {
+                t.ok( result, 'got result from store' );
+                t.equal( result && result.id, id, 'id is correct' );
+                t.equal( result && result.test, 'foo', 'content is correct' );
+                next( error );
+            } );
+        },
+
+        next => {
+            multi_data_store.delete( id, error => {
+                t.error( error, 'deleted object' );
+                next( error );
+            } );
+        },
+
+        next => {
+            multi_data_store.get( id, ( error, result ) => {
+                t.ok( result, 'got result from store, even after delete' );
+                t.equal( result && result.id, id, 'id is correct' );
+                t.equal( result && result.test, 'foo', 'content is correct' );
+                next( error );
+            } );
+        }
+
     ], error => {
         t.error( error, 'no errors' );
         t.end();

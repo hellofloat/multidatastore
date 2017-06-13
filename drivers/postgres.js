@@ -140,7 +140,7 @@ module.exports = {
             },
 
             next => {
-                result = this.options.unmapper( db_read_result );
+                result = db_read_result ? this.options.unmapper( db_read_result ) : null;
                 next();
             }
         ], error => {

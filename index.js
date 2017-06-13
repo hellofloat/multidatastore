@@ -47,6 +47,11 @@ module.exports = {
     delete: function( id, callback ) {
         this.drivers = this.drivers || [];
         async.each( this.drivers, ( driver, next ) => {
+            if ( driver.options && driver.options.ignore_delete ) {
+                next();
+                return;
+            }
+
             driver.delete( id, next );
         }, callback );
     }
