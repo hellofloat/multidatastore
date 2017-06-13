@@ -7,6 +7,7 @@ module.exports = {
     init: function( _options ) {
         this.options = extend( {
             id_field: 'id',
+            column_escape_character: '"',
             async: true,
             async_callback: error => {
                 if ( error ) {
@@ -57,7 +58,7 @@ module.exports = {
 
             next => {
                 client.query( {
-                    text: `select 1 from ${ this.options.table } where ${ this.options.id_field }=($1)`,
+                    text: `select 1 from ${ this.options.table } where ${ this.options.column_escape_character }${ this.options.id_field }${ this.options.column_escape_character }=($1)`,
                     values: [ mapped_object[ this.options.id_field ] ]
                 }, ( error, result ) => {
                     exists = result && result.rows && result.rows.length;
@@ -73,19 +74,15 @@ module.exports = {
                 if ( exists ) {
                     text = `
                         update ${ this.options.table }
-                        set ${ mapped_object_data_keys.map( ( key, index ) => key + '=($' + ( index + 1 ) + ')' ).join( ', ' ) }
-                        where ${ this.options.id_field }=($${ mapped_object_data_keys.length + 1 });`;
+                        set ${ mapped_object_data_keys.map( ( key, index ) => this.options.column_escape_character + key + this.options.column_escape_character + '=($' + ( index + 1 ) + ')' ).join( ', ' ) }
+                        where ${ this.options.column_escape_character }${ this.options.id_field }${ this.options.column_escape_character }=($${ mapped_object_data_keys.length + 1 });`;
 
                     values = mapped_object_data_keys.map( key => mapped_object[ key ] );
                     values.push( mapped_object[ this.options.id_field ] );
                 } else {
                     text = `
-                        insert into ${ this.options.table } (
-                            ${ [ this.options.id_field ].concat( mapped_object_data_keys ).join( ',' ) }
-                        )
-                        values (
-                            ${ [ this.options.id_field ].concat( mapped_object_data_keys ).map( ( key, index ) => '$' + ( index + 1 ) ) }
-                        );
+                        insert into ${ this.options.table } ( ${ [ this.options.id_field ].concat( mapped_object_data_keys ).map( key => this.options.column_escape_character + key + this.options.column_escape_character ).join( ', ' ) } )
+                        values ( ${ [ this.options.id_field ].concat( mapped_object_data_keys ).map( ( key, index ) => '$' + ( index + 1 ) ).join( ', ' ) } );
                     `;
 
                     values = [ this.options.id_field ].concat( mapped_object_data_keys ).map( key => mapped_object[ key ] );
@@ -131,7 +128,7 @@ module.exports = {
 
             next => {
                 client.query( {
-                    text: `select * from ${ this.options.table } where ${ this.options.id_field }=($1)`,
+                    text: `select * from ${ this.options.table } where ${ this.options.column_escape_character }${ this.options.id_field }${ this.options.column_escape_character }=($1)`,
                     values: [ id ]
                 }, ( error, _db_read_result ) => {
                     db_read_result = _db_read_result && _db_read_result.rows && _db_read_result.rows.length && _db_read_result.rows[ 0 ];
@@ -174,7 +171,7 @@ module.exports = {
 
             next => {
                 client.query( {
-                    text: `delete from ${ this.options.table } where ${ this.options.id_field }=($1)`,
+                    text: `delete from ${ this.options.table } where ${ this.options.column_escape_character }${ this.options.id_field }${ this.options.column_escape_character }=($1)`,
                     values: [ id ]
                 }, next );
             }

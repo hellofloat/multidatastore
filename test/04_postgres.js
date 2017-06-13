@@ -46,6 +46,7 @@ tape( 'postgres: put', t => {
     alasql( 'CREATE TABLE test (id string, data string)' );
 
     postgres_driver.init( {
+        column_escape_character: '`',
         async: false,
         pool: postgres_mock_pool,
         table: 'test',
@@ -83,6 +84,7 @@ tape( 'postgres: put (update)', t => {
     alasql( 'CREATE TABLE test (id string, data string)' );
 
     postgres_driver.init( {
+        column_escape_character: '`',
         async: false,
         readable: true,
         pool: postgres_mock_pool,
@@ -147,6 +149,7 @@ tape( 'postgres: get (readable)', t => {
     alasql( 'CREATE TABLE test (id string, data string)' );
 
     postgres_driver.init( {
+        column_escape_character: '`',
         async: false,
         readable: true,
         pool: postgres_mock_pool,
@@ -201,6 +204,7 @@ tape( 'postgres: get (unreadable)', t => {
     alasql( 'CREATE TABLE test (id string, data string)' );
 
     postgres_driver.init( {
+        column_escape_character: '`',
         async: false,
         pool: postgres_mock_pool,
         table: 'test',
@@ -253,6 +257,7 @@ tape( 'postgres: delete', t => {
     alasql( 'CREATE TABLE test (id string, data string)' );
 
     postgres_driver.init( {
+        column_escape_character: '`',
         async: false,
         readable: true,
         pool: postgres_mock_pool,
@@ -325,6 +330,7 @@ tape( 'postgres: delete (ignore_delete)', t => {
     alasql( 'CREATE TABLE test (id string, data string)' );
 
     postgres_driver.init( {
+        column_escape_character: '`',
         async: false,
         readable: true,
         ignore_delete: true,
@@ -402,6 +408,7 @@ tape( 'postgres: put (non-standard id_field)', t => {
     alasql( 'CREATE TABLE test (_id string, data string)' );
 
     postgres_driver.init( {
+        column_escape_character: '`',
         async: false,
         pool: postgres_mock_pool,
         table: 'test',
@@ -440,6 +447,7 @@ tape( 'postgres: put (update) (non-standard id_field)', t => {
     alasql( 'CREATE TABLE test (_id string, data string)' );
 
     postgres_driver.init( {
+        column_escape_character: '`',
         async: false,
         readable: true,
         pool: postgres_mock_pool,
@@ -505,6 +513,7 @@ tape( 'postgres: get (readable) (non-standard id_field)', t => {
     alasql( 'CREATE TABLE test (_id string, data string)' );
 
     postgres_driver.init( {
+        column_escape_character: '`',
         async: false,
         readable: true,
         pool: postgres_mock_pool,
@@ -560,6 +569,7 @@ tape( 'postgres: get (unreadable) (non-standard id_field)', t => {
     alasql( 'CREATE TABLE test (_id string, data string)' );
 
     postgres_driver.init( {
+        column_escape_character: '`',
         async: false,
         pool: postgres_mock_pool,
         table: 'test',
@@ -613,6 +623,7 @@ tape( 'postgres: delete (non-standard id_field)', t => {
     alasql( 'CREATE TABLE test (_id string, data string)' );
 
     postgres_driver.init( {
+        column_escape_character: '`',
         async: false,
         readable: true,
         pool: postgres_mock_pool,
@@ -686,6 +697,7 @@ tape( 'postgres: delete (ignore_delete) (non-standard id_field)', t => {
     alasql( 'CREATE TABLE test (_id string, data string)' );
 
     postgres_driver.init( {
+        column_escape_character: '`',
         async: false,
         readable: true,
         ignore_delete: true,

@@ -117,6 +117,7 @@ function get_multiple_store_setup( _options ) {
     const postgres_mock_pool = Object.create( Postgres_Mock_Pool );
     alasql( 'CREATE TABLE IF NOT EXISTS test_multiple_stores (id string, data string)' );
     postgres_driver.init( {
+        column_escape_character: '`',
         async: false,
         readable: options.readable.postgres || false,
         pool: postgres_mock_pool,
