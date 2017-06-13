@@ -29,7 +29,7 @@ module.exports = {
         }
 
         this.options.table.insert( object, {
-            upsert: true
+            replace: true
         } ).run( this.options.connection, callback );
     },
 
